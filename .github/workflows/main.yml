@@ -8,10 +8,14 @@ jobs:
     timeout-minutes: 9999
 
     steps:
+    - name: Install Tailscale on Windows
+      run: choco install tailscale -y
+
     - name: Connect to Tailscale
-      uses: tailscale/github-action@v2
-      with:
-        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+      run: |
+        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TS_OAUTH_SECRET }} --reset
+      env:
+        TS_OAUTH_SECRET: ${{ secrets.TS_OAUTH_SECRET }}
 
     - name: Enable Remote Desktop
       run: |
@@ -24,7 +28,7 @@ jobs:
 
     - name: Display Tailscale IP
       run: |
-        $ip = (tailscale ip -4)
+        $ip = (& "C:\Program Files\Tailscale\tailscale.exe" ip -4)
         Write-Host "=============================================="
         Write-Host "CONNECT TO RDP AT: $ip"
         Write-Host "Username: runneradmin"

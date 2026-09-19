@@ -1,4 +1,4 @@
-name: Window 10
+name: Windows 10
 
 on: [push, workflow_dispatch]
 
@@ -13,7 +13,7 @@ jobs:
 
     - name: Connect to Tailscale
       run: |
-        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TS_OAUTH_SECRET }} --reset
+        & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TS_OAUTH_SECRET }} --advertise-tags=tag:ci --reset
       env:
         TS_OAUTH_SECRET: ${{ secrets.TS_OAUTH_SECRET }}
 

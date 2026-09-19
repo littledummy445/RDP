@@ -8,16 +8,10 @@ jobs:
     timeout-minutes: 9999
 
     steps:
-    - name: Download ngrok v3
-      run: Invoke-WebRequest https://bin.equinox.io/c/bNy312VY63X/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-
-    - name: Extract ngrok
-      run: Expand-Archive ngrok.zip -DestinationPath ngrok
-
-    - name: Auth
-      run: .\ngrok\ngrok.exe authtoken $Env:NGROK_AUTH_TOKEN
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Connect to Tailscale
+      uses: tailscale/github-action@v2
+      with:
+        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
 
     - name: Enable Remote Desktop
       run: |
@@ -28,5 +22,17 @@ jobs:
     - name: Set Admin Password
       run: Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "@cyb3rking" -Force)
 
-    - name: Create Tunnel
-      run: .\ngrok\ngrok.exe tcp 3389
+    - name: Display Tailscale IP
+      run: |
+        $ip = (tailscale ip -4)
+        Write-Host "=============================================="
+        Write-Host "CONNECT TO RDP AT: $ip"
+        Write-Host "Username: runneradmin"
+        Write-Host "Password: @cyb3rking"
+        Write-Host "=============================================="
+
+    - name: Keep Runner Alive
+      run: |
+        while ($true) {
+            Start-Sleep -Seconds 60
+        }
